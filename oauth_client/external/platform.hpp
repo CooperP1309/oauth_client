@@ -19,6 +19,10 @@ class Platform
 public:
 	Platform(std::string);
 
+    /* API Handlers */
+    int get_endpoint(std::string, json&);
+    int post_endpoint(std::string, std::string, json&);
+
 private: 
     httplib::Params oauth_params;
     std::string host;
@@ -29,9 +33,6 @@ private:
     int extract_credentials(std::string);
 	int assign_value(std::string, std::string);
     int get_access_token();
-
-    /* API Functions */
-
 };
 
 Platform::Platform(std::string platform_name) 
@@ -163,6 +164,31 @@ int Platform::get_access_token()
     }
     
     return -1;
+}
+
+int Platform::get_endpoint(std::string endpoint, json& response) 
+{
+    httplib::SSLClient cli(host, 443);
+    
+    std::string auth_header = "Bearer " + access_token;
+    
+    httplib::Headers headers = 
+    {
+       {"Authorization", auth_header},
+       {"Content-Type", "application/json"}
+    };
+
+    auto res = cli.Get(endpoint, headers);
+
+    if (!res || res->status != 200) 
+    {
+        std::cerr << "Request failed" << std::endl;
+        return -1;
+    }
+        
+    response = json::parse(res->body);
+
+    return 0;
 }
 
 #endif // PLATFORM_H

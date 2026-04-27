@@ -5,32 +5,34 @@ This was made for small IT companies and is thus built for Windows devices as th
 (as far as I'm aware).
 
 ### Requirements
-For using the .exe:
-- Running the .exe and/or developing this repo further requires a Windows device.
+#### For using the .exe:
+- Windows device.
 - Must have a 'Client App' created in your respective RRM platform. (steps on this provided)
 - Internet connection.
 
-For development: 
+#### For development: 
+- Windows Device
 - Visual Studio Community/2022 (As the compiler)
-
-Note: This has only been tested with NinjaOne and Zoho. Though if your RRM just requires posting 
-some client app credentials to an endpoint, this will work.
 
 ### Using the exe (Example covers both NinjaOne and Zoho)
 	
 1. Create a client app in your RRM platofrm. In NinjaOne, select 'API Services' | in Zoho select 'Self Client'.
 
-#### Note: For some platforms (such as NinjaOne), you will need to enable the 'Client Credentials' grant type for your client app.
-
 2. In the root of this repo, create a 'client_credentials.txt' file and populate it with the required fields from your client app.
-
-#### Note!!!: a 'client_credentials_EXAMPLE.txt' has been provided for reference. Although this project only works with the 
-#### 'Client Credentials' grant type, a grant type field must still be provided in the txt file as some platforms may
-#### differ in the exact name of the field. E.g. 'grant_type' vs 'oauth_grant_type' etc...
 
 3. Run the 'oauth_client.exe' application in the root of this repo.
 
 4. When prompted, enter the exact platform name you used ('ninjaone' in the example txt) and enjoy your access token.
+
+#### NOTES
+```
+- For some platforms (such as NinjaOne), you will need to enable the 'Client Credentials' grant type for your client app.
+- a 'client_credentials_EXAMPLE.txt' has been provided for reference.
+- Although this project only works with the 'Client Credentials' grant type, a grant type field must still be provided in the txt file as some platforms may
+  differ in the exact name of the field. E.g. 'grant_type' vs 'oauth_grant_type' etc...
+- This has only been tested with NinjaOne and Zoho. Though if your RRM just requires posting 
+  some client app credentials to an endpoint, this will work.
+```
 
 ### Development (Steps align with Visual Studio Community)
 

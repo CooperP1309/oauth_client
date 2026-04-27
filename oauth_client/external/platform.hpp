@@ -63,7 +63,7 @@ int Platform::extract_credentials(std::string platform_name)
 {
     /* simplify space stripping by enforcing name.key=value standard in .txt file */ /* not my problem if you can't follow the rules! */
     platform_name = platform_name + ".";
-    fs::path file_path = fs::current_path().parent_path() / "client_credentials.txt";
+    fs::path file_path = fs::current_path() / "client_credentials.txt";
 
     std::ifstream file(file_path);
     if (file.is_open())

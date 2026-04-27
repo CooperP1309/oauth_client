@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="oauth_client/oauth_client.vcxproj" />
+  <Project Path="oauth_client/oauth_client.vcxproj" Id="49e179d4-0cfe-47a9-9387-c5e8372bb705" />
 </Solution>

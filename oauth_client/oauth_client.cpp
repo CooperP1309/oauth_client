@@ -7,7 +7,10 @@ int main()
 {
 	Platform platform("ninjaone");
 
-	std::cin.get();
+	while (1)
+	{
+
+	}
 
     return 0;
 }

@@ -1,5 +1,5 @@
-#ifndef UNIQUE_HEADER_NAME_H
-#define UNIQUE_HEADER_NAME_H
+#ifndef PLATFORM_H
+#define PLATFORM_H
 
 #include <string>
 #include <filesystem>
@@ -17,20 +17,18 @@ using json = nlohmann::json;
 class Platform 
 {
 public:
-
 	Platform(std::string);
 
 private: 
+    httplib::Params oauth_params;
     std::string host;
-    std::string client_id;
-	std::string client_secret;
-	std::string scope;
 	std::string token_endpoint;
+	std::string access_token;
 
 	/* Initializer Functions */
     int extract_credentials(std::string);
 	int assign_value(std::string, std::string);
-    int get_access_token(std::string&);
+    int get_access_token();
 
     /* API Functions */
 
@@ -51,33 +49,27 @@ Platform::Platform(std::string platform_name)
         return;
     }
 
-	std::cout << "Extracted following credentials for platform: '" << platform_name << "'" << std::endl << std::endl;
-	std::cout << "\tclient_id: " << client_id << std::endl;
-	std::cout << "\tclient_secret: " << client_secret << std::endl;
-	std::cout << "\tscope: " << scope << std::endl;
-	std::cout << "\ttoken_endpoint: " << token_endpoint << std::endl;
-	std::cout << "\thost: " << host << std::endl << std::endl;
-
-    std::string result_buffer;
-	if (get_access_token(result_buffer)) 
+	if (get_access_token()) 
     {
         std::cerr << "Failed to get access token for platform: '" << platform_name << "'" << std::endl;
         return;
     }
 
-	std::cout << "Successfully initialized platform: '" << platform_name << "'" << std::endl << std::endl;    
-    std::cout << "\tAccess Token: " << result_buffer << std::endl << std::endl;
+	std::cout << "Successfully initialized platform: '" << platform_name << "'\n\n";    
+    std::cout << "\tAccess Token: " << access_token << "\n" << std::endl;
 }
 
 int Platform::extract_credentials(std::string platform_name)
 {
-    /* simplify space stripping by enforcing name.key standard */
+    /* simplify space stripping by enforcing name.key=value standard in .txt file */ /* not my problem if you can't follow the rules! */
     platform_name = platform_name + ".";
-    fs::path file_path = fs::current_path() / "client_credentials.txt";
+    fs::path file_path = fs::current_path().parent_path() / "client_credentials.txt";
 
     std::ifstream file(file_path);
     if (file.is_open())
     {
+        std::cout << "Extracting credentials for Platform: '" << platform_name << "'\n\n";
+        
         std::string line;
         while (std::getline(file, line))
         {
@@ -95,6 +87,7 @@ int Platform::extract_credentials(std::string platform_name)
 
                     if (assign_value(key, value))
                     {
+                        std::cout << std::endl;
                         return -1;
                     }
                 }
@@ -102,6 +95,8 @@ int Platform::extract_credentials(std::string platform_name)
         }
 
         file.close();
+
+        std::cout << "\thost + token endpoint = '" << host << "' + '" << token_endpoint << "'\n" << std::endl;
 
         return 0;
     }
@@ -114,36 +109,24 @@ int Platform::extract_credentials(std::string platform_name)
 
 int Platform::assign_value(std::string key, std::string value)
 {
-    if (key == "client_id")
-    {
-        client_id = value;
-    }
-    else if (key == "client_secret")
-    {
-		client_secret = value;
-    }
-    else if (key == "scope")
-    {
-		scope = value;
-    }
-    else if (key == "token_endpoint")
-    {
-		token_endpoint = value;
-    }
-    else if (key == "host")
+    if (key == "host") 
     {
 		host = value;
     }
+    else if (key == "token_endpoint")
+    {
+        token_endpoint = value;
+    }
     else {
-        std::cerr << "Unknown key: " << key << std::endl;
-		return -1;
+        std::cout << "\t'" << key << "' = '" << value << "'\n";
+        oauth_params.emplace(key, value);
     }
 
     return 0;
 }
 
 
-int Platform::get_access_token(std::string &result_buffer)
+int Platform::get_access_token()
 /*  
 *   Specialized request client for getting access token.
 *
@@ -152,7 +135,7 @@ int Platform::get_access_token(std::string &result_buffer)
 *   get an access token.
 */
 {
-	if (host.empty() || client_id.empty() || client_secret.empty() || scope.empty() || token_endpoint.empty()) 
+	if (host.empty() || token_endpoint.empty() || oauth_params.empty()) 
     {
         std::cerr << "Missing required credentials for access token request." << std::endl;
         return -1;
@@ -161,21 +144,12 @@ int Platform::get_access_token(std::string &result_buffer)
     httplib::SSLClient cli(host, 443);
     cli.enable_server_certificate_verification(true);
 
-    httplib::Params params;
-    params.emplace("grant_type", "client_credentials");
-    params.emplace("client_id", client_id);
-    params.emplace("client_secret", client_secret);
-    params.emplace("scope", scope);
-    auto res = cli.Post(token_endpoint, params);
+    auto res = cli.Post(token_endpoint, oauth_params);
 
     if (res && res->status == 200) 
     {
-        std::cout << "POST Status: " << res->status << std::endl;
-		
-        /* Parse JSON response and extract Access Token */
-        result_buffer = res->body;
-		json response_json = json::parse(result_buffer);
-		result_buffer = response_json["access_token"].get<std::string>();
+		json response_json = json::parse(res->body);
+		access_token = response_json["access_token"].get<std::string>();
 
 		return 0;
     }
@@ -191,4 +165,4 @@ int Platform::get_access_token(std::string &result_buffer)
     return -1;
 }
 
-#endif // UNIQUE_HEADER_NAME_H
+#endif // PLATFORM_H

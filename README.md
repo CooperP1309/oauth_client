@@ -20,9 +20,11 @@ This was made for small IT companies and is thus built for Windows devices as th
 
 2. In the root of this repo, create a 'client_credentials.txt' file and populate it with the required fields from your client app.
 
-3. Run the 'oauth_client.exe' application in the root of this repo.
+3. Copy 'oauth_client.exe' in the folder: x64/Debug/ to the root of the project
 
-4. When prompted, enter the exact platform name you used ('ninjaone' in the example txt) and enjoy your access token.
+4. Run the 'oauth_client.exe' application once in the root of the project.
+
+5. When prompted, enter the exact platform name you used ('ninjaone' in the example txt) and enjoy your access token.
 
 #### NOTES
 ```
